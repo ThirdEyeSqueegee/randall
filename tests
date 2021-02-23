@@ -1,0 +1,9 @@
+#!/bin/sh
+
+count=$(./randall 27 | wc -c)
+if [ $count -eq 27 ]
+then
+    echo "randall is producing the correct number of random bytes."
+else
+    echo "randall appears to be malfunctioning."
+fi

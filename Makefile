@@ -44,7 +44,10 @@ submission-files = $(assignment-files) \
 randall-submission.$(TAREXT): $(submission-files)
 	$(TAR) $(TARFLAGS) -cf $@ $(submission-files)
 
-.PHONY: default clean assignment submission
+.PHONY: default clean assignment submission check
 
 clean:
 	rm -f *.o *.$(TAREXT) randall
+
+check:
+	./tests

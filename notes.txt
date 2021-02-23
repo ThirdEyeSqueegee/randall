@@ -1,0 +1,8 @@
+I first compiled randall by running `make`, which produced the `randall` object
+file. Next, I created a new shell script, `tests`, which runs randall and 
+compares the output to the expected output. After running `chmod +x tests` to
+allow for execution of this shell script, I began writing the `check` target in
+the Makefile. To this end, I first added `check` as a .PHONY target in the
+Makefile, and then added a line that calls the `tests` script. Now, the command
+`make check` runs randall with an argument of 27 and checks to see if randall
+does indeed output 27 random bytes.
