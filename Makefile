@@ -21,7 +21,7 @@ OPTIMIZE =
 # The C compiler and its options.
 CC = gcc
 CFLAGS = $(OPTIMIZE) -g3 -Wall -Wextra -fanalyzer \
-  -march=native -mtune=native -mrdrnd
+  -march=native -mtune=native -mrdrnd -fsanitize=undefined
 
 # The archiver command, its options and filename extension.
 TAR = tar
@@ -30,8 +30,9 @@ TAREXT = txz
 
 default: randall
 
-randall: randall.c
-	$(CC) $(CFLAGS) $@.c -o $@
+randall-files = options.c output.c rand64-hw.c rand64-sw.c randall.c
+randall:
+	$(CC) $(CFLAGS) $(randall-files) -o $@
 
 assignment: randall-assignment.$(TAREXT)
 assignment-files = COPYING Makefile randall.c

@@ -1,8 +1,41 @@
-I first compiled randall by running `make`, which produced the `randall` object
-file. Next, I created a new shell script, `tests`, which runs randall and 
+1. I compiled randall by running `make`, which produced the `randall` object
+file. Next, I created a new shell script, `tests`, which runs randall and
 compares the output to the expected output. After running `chmod +x tests` to
 allow for execution of this shell script, I began writing the `check` target in
 the Makefile. To this end, I first added `check` as a .PHONY target in the
 Makefile, and then added a line that calls the `tests` script. Now, the command
 `make check` runs randall with an argument of 27 and checks to see if randall
 does indeed output 27 random bytes.
+
+2. I moved the hardware-based RNG implementation to rand64-hw.c, and included
+the associated function prototypes in rand64-hw.h. I took care to only include
+header files which were necessary, which in this case turned out to be:
+    * rand64-hw.h:
+        stdbool.h
+    * rand64-hw.c:
+        cpuid.h
+        immintrin.h
+        rand64-hw.h
+
+3. I moved the hardware-based RNG implementation to rand64-sw.c, and included
+the associated function prototypes in rand64-sw.h. I took care to only include
+header files which were necessary, which in this case turned out to be:
+    * rand64-sw.h:
+        stdlib.h
+    * rand64-sw.c:
+        stdio.h
+        rand64-sw.h
+
+4. I moved the output implementation (writebytes) to output.c and included the
+associated function prototype in output.h. I took care to only include header
+files which were necessary, which in this case turned out to be:
+    * output.h:
+        stdbool.h
+    * output.c:
+        limits.h
+        stdio.h
+        output.h
+
+5. I edited the Makefile so that running `make` links compiles the new .c files
+correctly, and ran `make check` to ensure that randall still returned expected
+outputs.

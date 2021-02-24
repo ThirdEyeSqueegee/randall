@@ -22,108 +22,12 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include <cpuid.h>
+#include "options.h"
+#include "output.h"
+#include "rand64-hw.h"
+#include "rand64-sw.h"
 #include <errno.h>
-#include <immintrin.h>
-#include <limits.h>
-#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
-
-/* Hardware implementation.  */
-
-/* Description of the current CPU.  */
-struct cpuid { unsigned eax, ebx, ecx, edx; };
-
-/* Return information about the CPU.  See <http://wiki.osdev.org/CPUID>.  */
-static struct cpuid
-cpuid (unsigned int leaf, unsigned int subleaf)
-{
-  struct cpuid result;
-  asm ("cpuid"
-       : "=a" (result.eax), "=b" (result.ebx),
-	 "=c" (result.ecx), "=d" (result.edx)
-       : "a" (leaf), "c" (subleaf));
-  return result;
-}
-
-/* Return true if the CPU supports the RDRAND instruction.  */
-static _Bool
-rdrand_supported (void)
-{
-  struct cpuid extended = cpuid (1, 0);
-  return (extended.ecx & bit_RDRND) != 0;
-}
-
-/* Initialize the hardware rand64 implementation.  */
-static void
-hardware_rand64_init (void)
-{
-}
-
-/* Return a random value, using hardware operations.  */
-static unsigned long long
-hardware_rand64 (void)
-{
-  unsigned long long int x;
-  while (! _rdrand64_step (&x))
-    continue;
-  return x;
-}
-
-/* Finalize the hardware rand64 implementation.  */
-static void
-hardware_rand64_fini (void)
-{
-}
-
-
-
-/* Software implementation.  */
-
-/* Input stream containing random bytes.  */
-static FILE *urandstream;
-
-/* Initialize the software rand64 implementation.  */
-static void
-software_rand64_init (void)
-{
-  urandstream = fopen ("/dev/random", "r");
-  if (! urandstream)
-    abort ();
-}
-
-/* Return a random value, using software operations.  */
-static unsigned long long
-software_rand64 (void)
-{
-  unsigned long long int x;
-  if (fread (&x, sizeof x, 1, urandstream) != 1)
-    abort ();
-  return x;
-}
-
-/* Finalize the software rand64 implementation.  */
-static void
-software_rand64_fini (void)
-{
-  fclose (urandstream);
-}
-
-static bool
-writebytes (unsigned long long x, int nbytes)
-{
-  do
-    {
-      if (putchar (x) < 0)
-	return false;
-      x >>= CHAR_BIT;
-      nbytes--;
-    }
-  while (0 < nbytes);
-
-  return true;
-}
 
 /* Main program, which outputs N bytes of random data.  */
 int
@@ -138,9 +42,9 @@ main (int argc, char **argv)
       errno = 0;
       nbytes = strtoll (argv[1], &endptr, 10);
       if (errno)
-	perror (argv[1]);
+        perror (argv[1]);
       else
-	valid = !*endptr && 0 <= nbytes;
+        valid = !*endptr && 0 <= nbytes;
     }
   if (!valid)
     {
@@ -179,10 +83,10 @@ main (int argc, char **argv)
       unsigned long long x = rand64 ();
       int outbytes = nbytes < wordsize ? nbytes : wordsize;
       if (!writebytes (x, outbytes))
-	{
-	  output_errno = errno;
-	  break;
-	}
+        {
+          output_errno = errno;
+          break;
+        }
       nbytes -= outbytes;
     }
   while (0 < nbytes);
