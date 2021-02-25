@@ -70,3 +70,22 @@ to ensure that the right files went into randall-submission.txz.
 
 12. I wrote a few more tests for `make check`, which I added to the tests shell
 script in the root folder.
+
+
+
+Results of timing calls to randall:
+
+$ time ./randall 133562368 >/dev/null
+real    0m2.630s
+user    0m2.630s
+sys     0m0.000s
+
+$ time ./randall 133562368 | cat >/dev/null
+real    0m3.405s
+user    0m3.085s
+sys     0m1.392s
+
+$ time ./randall 133562368 >rand.data
+real    0m3.094s
+user    0m2.921s
+sys     0m0.170s
