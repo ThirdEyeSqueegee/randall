@@ -1,6 +1,12 @@
 #include <stdbool.h>
 
-struct cpuid cpuid (unsigned int, unsigned int);
+/* Description of the current CPU.  */
+struct cpuid
+{
+  unsigned eax, ebx, ecx, edx;
+};
+
+struct cpuid cpuid (unsigned int leaf, unsigned int subleaf);
 
 _Bool rdrand_supported (void);
 

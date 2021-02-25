@@ -16,12 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 # Optimization level.  Change this -O2 to -Og or -O0 or whatever.
-OPTIMIZE =
+OPTIMIZE = -Ofast
 
 # The C compiler and its options.
 CC = gcc
-CFLAGS = $(OPTIMIZE) -g3 -Wall -Wextra -fanalyzer \
-  -march=native -mtune=native -mrdrnd -fsanitize=undefined
+CFLAGS = $(OPTIMIZE) -flto -march=native -mtune=native -mrdrnd
 
 # The archiver command, its options and filename extension.
 TAR = tar
@@ -30,18 +29,33 @@ TAREXT = txz
 
 default: randall
 
-randall-files = options.c output.c rand64-hw.c rand64-sw.c randall.c
-randall:
-	$(CC) $(CFLAGS) $(randall-files) -o $@
+header-files = mrand_rand64.h options.h output.h rand64-hw.h rand64-sw.h
+randall-files = mrand_rand64.c options.c output.c rand64-hw.c rand64-sw.c \
+  randall.c
 
-assignment: randall-assignment.$(TAREXT)
-assignment-files = COPYING Makefile randall.c
-randall-assignment.$(TAREXT): $(assignment-files)
-	$(TAR) $(TARFLAGS) -cf $@ $(assignment-files)
+randall: randall.c mrand_rand64.o options.o output.o rand64-hw.o rand64-sw.o
+	$(CC) $(CFLAGS) randall.c mrand_rand64.o options.o output.o rand64-hw.o rand64-sw.o -o $@
+
+mrand_rand64.o: mrand_rand64.c mrand_rand64.h
+	$(CC) $(CFLAGS) -c mrand_rand64.c
+
+options.o: options.c options.h
+	$(CC) $(CFLAGS) -c options.c
+
+output.o: output.c output.h
+	$(CC) $(CFLAGS) -c output.c
+
+rand64-hw.o: rand64-hw.c rand64-hw.h
+	$(CC) $(CFLAGS) -c rand64-hw.c
+
+rand64-sw.o: rand64-sw.c rand64-sw.h
+	$(CC) $(CFLAGS) -c rand64-sw.c
 
 submission: randall-submission.$(TAREXT)
-submission-files = $(assignment-files) \
-  notes.txt # More files should be listed here, as needed.
+
+submission-files = $(randall-files) $(header-files) \
+  COPYING Makefile notes.txt tests
+
 randall-submission.$(TAREXT): $(submission-files)
 	$(TAR) $(TARFLAGS) -cf $@ $(submission-files)
 

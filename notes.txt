@@ -19,11 +19,10 @@ header files which were necessary, which in this case turned out to be:
 
 3. I moved the hardware-based RNG implementation to rand64-sw.c, and included
 the associated function prototypes in rand64-sw.h. I took care to only include
-header files which were necessary, which in this case turned out to be:
-    * rand64-sw.h:
-        stdlib.h
+header files which were necessary, which in this case turned out to be:   
     * rand64-sw.c:
         stdio.h
+        stdlib.h
         rand64-sw.h
 
 4. I moved the output implementation (writebytes) to output.c and included the
@@ -32,10 +31,42 @@ files which were necessary, which in this case turned out to be:
     * output.h:
         stdbool.h
     * output.c:
+        errno.h
         limits.h
         stdio.h
+        stdlib.h
+        string.h
+        unistd.h
         output.h
+        mrand_rand64.h
+        rand64-hw.h
+        rand64-sw.h
 
 5. I edited the Makefile so that running `make` links compiles the new .c files
 correctly, and ran `make check` to ensure that randall still returned expected
 outputs.
+
+6. I modified randall.c to conditionally validate the command line inputs that
+are passed into randall, and to throw errors or initialize modules accordingly.
+
+7. I implemented the parser() function in options.c, which user getopt to parse
+command line options. I defined a struct options in options.h, which contains
+metainformation about the command line options that are passed into randall.
+
+8. I created two new files, mrand_rand64.c/h, which handle the `-i mrand48_r`
+command line option, i.e., random number generation using GNU's mrand48_r
+function. I then included mrand_rand64.h in randall.c.
+
+9. I moved the code that handles output from main() in randall.c to a new
+function, output() in output.c.
+
+10. I modified the writebytes() function in output.c to handle the `-o N` option,
+i.e., write N random bytes at a time using the write syscall instead of writing
+bytes to stdio using putchar().
+
+11. I modified the Makefile to correctly link and compile the various source
+files that I created, and modified the submission-files variable in the Makefile
+to ensure that the right files went into randall-submission.txz.
+
+12. I wrote a few more tests for `make check`, which I added to the tests shell
+script in the root folder.

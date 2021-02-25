@@ -22,84 +22,69 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
+#include "mrand_rand64.h"
 #include "options.h"
 #include "output.h"
 #include "rand64-hw.h"
 #include "rand64-sw.h"
-#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Main program, which outputs N bytes of random data.  */
 int
 main (int argc, char **argv)
 {
-  /* Check arguments.  */
-  bool valid = false;
-  long long nbytes;
-  if (argc == 2)
-    {
-      char *endptr;
-      errno = 0;
-      nbytes = strtoll (argv[1], &endptr, 10);
-      if (errno)
-        perror (argv[1]);
-      else
-        valid = !*endptr && 0 <= nbytes;
-    }
-  if (!valid)
-    {
-      fprintf (stderr, "%s: usage: %s NBYTES\n", argv[0], argv[0]);
-      return 1;
-    }
+  /* Initialize options struct and parse command line args.  */
+  struct options *opt = malloc (sizeof (struct options));
+  parser (argc, argv, opt);
 
-  /* If there's no work to do, don't worry about which library to use.  */
-  if (nbytes == 0)
-    return 0;
+  /* Initialize the default random number generator.  */
+  void (*initialize) (void) = hardware_rand64_init;
+  unsigned long long (*rand64) (void) = hardware_rand64;
+  void (*finalize) (void) = hardware_rand64_fini;
 
-  /* Now that we know we have work to do, arrange to use the
-     appropriate library.  */
-  void (*initialize) (void);
-  unsigned long long (*rand64) (void);
-  void (*finalize) (void);
-  if (rdrand_supported ())
+  /* Check command line arguments and throw errors/initialize modules.  */
+  if (opt->input_flag && opt->input_arg != NULL)
     {
-      initialize = hardware_rand64_init;
-      rand64 = hardware_rand64;
-      finalize = hardware_rand64_fini;
-    }
-  else
-    {
-      initialize = software_rand64_init;
-      rand64 = software_rand64;
-      finalize = software_rand64_fini;
+      if (!strcmp (opt->input_arg, "rdrand") && !rdrand_supported ())
+        {
+          fprintf (stderr, "rdrand not supported\n");
+          return 1;
+        }
+      if (!strcmp (opt->input_arg, "mrand48_r"))
+        {
+          {
+            initialize = mrand_rand64_init;
+            rand64 = mrand_rand64;
+            finalize = mrand_rand64_fini;
+          }
+        }
+      if (opt->input_arg[0] == '/')
+        {
+          void (*init_sw) (char *path) = software_rand64_init;
+          rand64 = software_rand64;
+          finalize = software_rand64_fini;
+
+          init_sw (opt->input_arg);
+        }
     }
 
   initialize ();
+
   int wordsize = sizeof rand64 ();
   int output_errno = 0;
 
-  do
-    {
-      unsigned long long x = rand64 ();
-      int outbytes = nbytes < wordsize ? nbytes : wordsize;
-      if (!writebytes (x, outbytes))
-        {
-          output_errno = errno;
-          break;
-        }
-      nbytes -= outbytes;
-    }
-  while (0 < nbytes);
-
-  if (fclose (stdout) != 0)
-    output_errno = errno;
-
-  if (output_errno)
-    {
-      errno = output_errno;
-      perror ("output");
-    }
+  /* Handle output.  */
+  output (rand64, opt->output_arg, opt->nbytes, wordsize, output_errno);
 
   finalize ();
-  return !!output_errno;
+
+  if (opt->input_arg != NULL)
+    free (opt->input_arg);
+  if (opt->output_arg != NULL)
+    free (opt->output_arg);
+  free (opt);
+
+  return 0;
 }

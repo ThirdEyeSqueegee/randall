@@ -1,5 +1,6 @@
 #include "rand64-sw.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /* Software implementation.  */
 
@@ -8,9 +9,9 @@ FILE *urandstream;
 
 /* Initialize the software rand64 implementation.  */
 void
-software_rand64_init (void)
+software_rand64_init (char *path)
 {
-  urandstream = fopen ("/dev/random", "r");
+  urandstream = fopen (path, "r");
   if (!urandstream)
     abort ();
 }

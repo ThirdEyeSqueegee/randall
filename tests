@@ -1,9 +1,155 @@
 #!/bin/sh
 
-count=$(./randall 27 | wc -c)
-if [ $count -eq 27 ]
+count=$(./randall 3301 | wc -c)
+echo "\$ ./randall 3301"
+if [ $count -eq 3301 ]
 then
-    echo "randall is producing the correct number of random bytes."
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
 else
-    echo "randall appears to be malfunctioning."
+    echo "failed\n"
+fi
+
+sleep 0.5
+
+count=$(./randall -i rdrand 3301 | wc -c)
+echo "\$ ./randall -i rdrand 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i mrand48_r 3301 | wc -c)
+echo "\$ ./randall -i mrand48_r 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i /dev/urandom 3301 | wc -c)
+echo "\$ ./randall -i /dev/urandom 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -o stdio 3301 | wc -c)
+echo "\$ ./randall -o stdio 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -o 27 3301 | wc -c)
+echo "\$ ./randall -o 27 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i rdrand -o 27 3301 | wc -c)
+echo "\$ ./randall -i rdrand -o 27 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i mrand48_r -o 27 3301 | wc -c)
+echo "\$ ./randall -i mrand48_r -o 27 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i /dev/urandom -o 27 3301 | wc -c)
+echo "\$ ./randall -i /dev/urandom -o 27 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i rdrand -o stdio 3301 | wc -c)
+echo "\$ ./randall -i rdrand -o stdio 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i mrand48_r -o stdio 3301 | wc -c)
+echo "\$ ./randall -i mrand48_r -o stdio 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
+fi
+
+sleep 0.5
+
+count=$(./randall -i /dev/urandom -o stdio 3301 | wc -c)
+echo "\$ ./randall -i /dev/urandom -o stdio 3301"
+if [ $count -eq 3301 ]
+then
+    echo "Expected output: 3301"
+    echo "Actual output: 3301"
+    echo "passed\n"
+else
+    echo "failed"
 fi

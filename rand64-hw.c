@@ -4,12 +4,6 @@
 
 /* Hardware implementation.  */
 
-/* Description of the current CPU.  */
-struct cpuid
-{
-  unsigned eax, ebx, ecx, edx;
-};
-
 /* Return information about the CPU.  See <http://wiki.osdev.org/CPUID>.  */
 struct cpuid
 cpuid (unsigned int leaf, unsigned int subleaf)
