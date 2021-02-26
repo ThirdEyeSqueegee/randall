@@ -54,11 +54,9 @@ main (int argc, char **argv)
         }
       if (!strcmp (opt->input_arg, "mrand48_r"))
         {
-          {
-            initialize = mrand_rand64_init;
-            rand64 = mrand_rand64;
-            finalize = mrand_rand64_fini;
-          }
+          initialize = mrand_rand64_init;
+          rand64 = mrand_rand64;
+          finalize = mrand_rand64_fini;
         }
       if (opt->input_arg[0] == '/')
         {
