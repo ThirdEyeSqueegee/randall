@@ -11,6 +11,8 @@ parser (int argc, char **argv, struct options *opt)
   char *endptr;
   opt->input_arg = NULL;
   opt->output_arg = NULL;
+
+  /* Parse command line arguments using getopt  */
   while ((c = getopt (argc, argv, "i:o:h")) != -1)
     {
       size_t len = strlen (optarg) + 1;

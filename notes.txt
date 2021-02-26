@@ -1,3 +1,9 @@
+NOTE: These notes are not exhaustive, and skim over several implementation
+details. Please read the code (and comments) if you're curious about how 
+something was implemented.
+
+---
+
 1. I compiled randall by running `make`, which produced the `randall` object
 file. Next, I created a new shell script, `tests`, which runs randall and
 compares the output to the expected output. After running `chmod +x tests` to
@@ -41,37 +47,56 @@ files which were necessary, which in this case turned out to be:
         mrand_rand64.h
         rand64-hw.h
         rand64-sw.h
+    * The reason there are so many includes in output.c is because it requires
+    all three RNG APIs in order to generate the correct type of random bytes
+    during its write loop.
 
-5. I edited the Makefile so that running `make` links compiles the new .c files
-correctly, and ran `make check` to ensure that randall still returned expected
-outputs.
+5. I edited the Makefile so that running `make` links and compiles the new .c 
+files correctly, and ran `make check` to ensure that randall still returned 
+expected outputs.
 
 6. I modified randall.c to conditionally validate the command line inputs that
-are passed into randall, and to throw errors or initialize modules accordingly.
+are passed into randall based on the homework spec, and to throw errors or 
+initialize modules accordingly.
 
 7. I implemented the parser() function in options.c, which uses getopt to parse
 command line options. I defined a struct options in options.h, which contains
-metainformation about the command line options that are passed into randall.
+metainformation about the command line options that are passed into randall. I
+then called parser() in randall.c.
 
 8. I created two new files, mrand_rand64.c/h, which handle the `-i mrand48_r`
 command line option, i.e., random number generation using GNU's mrand48_r
-function. I then included mrand_rand64.h in randall.c.
+function. I then included mrand_rand64.h in randall.c. Since mrand48_r outputs
+a 32-bit int, and we want a 64-bit int, I called mrand48_r twice in
+mrand_rand64() and did some bit-level operations to concatenate the two 32-bit
+ints into one 64-bit int.
 
-9. I moved the code that handles output from main() in randall.c to a new
-function, output() in output.c.
+9. I modified the software_rand64_init function to accept a char * argument
+which represents the path of the file that the user wants randall to read from
+when the user invokes randall with `-i /FILE`.
 
-10. I modified the writebytes() function in output.c to handle the `-o N` 
+10. I moved the code that handles output from main() in randall.c to a new
+function, output() in output.c. I modified the arguments it takes and included
+a function pointed to the random number generator that was initialized in main()
+prior to being passed into output().
+
+11. I modified the writebytes() function in output.c to handle the `-o N` 
 option, i.e., write N random bytes at a time using the write syscall instead of 
-writing to stdio using putchar().
+writing to stdio using putchar() if the option for the `-o` flag is not `stdio`.
 
-11. I modified the Makefile to correctly link and compile the various source
-files that I created, and modified the submission-files variable in the Makefile
-to ensure that the right files went into randall-submission.txz.
+12. I modified the Makefile to correctly link and compile the various source
+files that I created, building each module incrementally instead of building
+everything all at once, and modified the submission-files variable in the 
+Makefile to ensure that the right files went into randall-submission.txz. I also
+modified the gcc flags by removing all the flags that were useful during
+development and including the -Ofast and -flto flags for compile- and link-time 
+optimizations.
 
-12. I wrote a few more tests for `make check`, which I added to the tests shell
-script in the root folder.
+13. I wrote a few more tests for `make check`, which I added to the tests shell
+script in the root folder. These tests check all the permutations of invoking
+randall with//without the -i and -o flags.
 
-
+---
 
 Results of timing calls to randall:
 

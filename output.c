@@ -12,6 +12,7 @@
 bool
 writebytes (unsigned long long (*rand64) (void), char *output_arg, int nbytes)
 {
+  /* Write N bytes at a time using the write() syscall.  */
   if (output_arg != NULL && strcmp (output_arg, "stdio"))
     {
       int total_written = 0;
@@ -41,6 +42,7 @@ writebytes (unsigned long long (*rand64) (void), char *output_arg, int nbytes)
 
       return true;
     }
+  /* Write using putchar.  */
   else
     {
       unsigned long long x = rand64 ();

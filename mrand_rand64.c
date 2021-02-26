@@ -3,6 +3,7 @@
 
 struct drand48_data *buffer;
 
+/* Initialize the mrand48_r RNG implementation.  */
 void
 mrand_rand64_init (void)
 {
@@ -10,6 +11,7 @@ mrand_rand64_init (void)
   srand48_r (time (NULL), buffer);
 }
 
+/* Return a random value, using GNU's mrand48_r function.  */
 unsigned long long
 mrand_rand64 (void)
 {
@@ -21,6 +23,7 @@ mrand_rand64 (void)
   return x;
 }
 
+/* Finalize the mrand48_r RNG implementation.  */
 void
 mrand_rand64_fini (void)
 {
