@@ -41,7 +41,7 @@ parser (int argc, char **argv, struct options *opt)
           break;
         case 'h':
           fprintf (stdout,
-                   "usage: ./randall [-i <option>] [-o <option] NBYTES\n");
+                   "usage: ./randall [-i <option>] [-o <option>] NBYTES\n");
           exit (0);
         case '?':
           fprintf (stderr, "Unknown option: -%c\n", optopt);
