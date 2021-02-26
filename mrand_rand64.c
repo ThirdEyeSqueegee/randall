@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+/* mrand48_r implementation.  */
+
 struct drand48_data *buffer;
 
 /* Initialize the mrand48_r RNG implementation.  */

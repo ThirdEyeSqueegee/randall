@@ -80,9 +80,9 @@ function, output() in output.c. I modified the arguments it takes and included
 a function pointed to the random number generator that was initialized in main()
 prior to being passed into output().
 
-11. I modified the writebytes() function in output.c to handle the `-o N` 
-option, i.e., write N random bytes at a time using the write syscall instead of 
-writing to stdio using putchar() if the option for the `-o` flag is not `stdio`.
+11. I modified output() to handle the `-o N` option, i.e., write N random bytes 
+at a time using the write syscall instead of writing to stdio using putchar() if
+the option for the `-o` flag is not `stdio`.
 
 12. I modified the Makefile to correctly link and compile the various source
 files that I created, building each module incrementally instead of building

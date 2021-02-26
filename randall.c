@@ -39,6 +39,11 @@ main (int argc, char **argv)
   struct options *opt = malloc (sizeof (struct options));
   parser (argc, argv, opt);
 
+  /* If there's no work to do, don't worry about which
+     library to use.  */
+  if (opt->nbytes == 0)
+    return 0;
+
   /* Initialize the default random number generator.  */
   void (*initialize) (void) = hardware_rand64_init;
   unsigned long long (*rand64) (void) = hardware_rand64;

@@ -153,3 +153,8 @@ then
 else
     echo "failed"
 fi
+
+sleep 0.5
+
+echo "\$ strace --trace=write ./randall -o 27 100 2>&1 >/dev/null | grep "= 27""
+strace --trace=write ./randall -o 27 100 2>&1 >/dev/null | grep "= 27"

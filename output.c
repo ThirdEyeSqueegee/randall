@@ -10,9 +10,25 @@
 #include <unistd.h>
 
 bool
-writebytes (unsigned long long (*rand64) (void), char *output_arg, int nbytes)
+writebytes (unsigned long long x, int nbytes)
 {
-  /* Write N bytes at a time using the write() syscall.  */
+  do
+    {
+      if (putchar (x) < 0)
+        return false;
+      x >>= CHAR_BIT;
+      nbytes--;
+    }
+  while (0 < nbytes);
+
+  return true;
+}
+
+void
+output (unsigned long long (*rand64) (void), char *output_arg,
+        long long nbytes, int wordsize, int output_errno)
+{
+  /* Print N bytes at a time using the write() syscall.  */
   if (output_arg != NULL && strcmp (output_arg, "stdio"))
     {
       int total_written = 0;
@@ -29,59 +45,38 @@ writebytes (unsigned long long (*rand64) (void), char *output_arg, int nbytes)
           while (x > 0 && index < bufsize)
             {
               buffer[index++] = x;
-              x >>= CHAR_BIT;
+              x >>= 1;
             }
           if (index == bufsize)
-            {
-              total_written += write (STDOUT_FILENO, (void *)buffer, bufsize);
-            }
+            total_written += write (STDOUT_FILENO, (void *)buffer, bufsize);
         }
       while (total_written < required_to_write);
 
       free (buffer);
-
-      return true;
     }
-  /* Write using putchar.  */
+  /* Print using putchar().  */
   else
     {
-      unsigned long long x = rand64 ();
       do
         {
-          if (putchar (x) < 0)
-            return false;
-          x >>= CHAR_BIT;
-          nbytes--;
+          unsigned long long x = rand64 ();
+          int outbytes = nbytes < wordsize ? nbytes : wordsize;
+          if (!writebytes (x, outbytes))
+            {
+              output_errno = errno;
+              break;
+            }
+          nbytes -= outbytes;
         }
       while (0 < nbytes);
 
-      return true;
-    }
-  return false;
-}
+      if (fclose (stdout) != 0)
+        output_errno = errno;
 
-void
-output (unsigned long long (*rand64) (void), char *output_arg,
-        long long nbytes, int wordsize, int output_errno)
-{
-  do
-    {
-      int outbytes = nbytes < wordsize ? nbytes : wordsize;
-      if (!writebytes (rand64, output_arg, outbytes))
+      if (output_errno)
         {
-          output_errno = errno;
-          break;
+          errno = output_errno;
+          perror ("output");
         }
-      nbytes -= outbytes;
-    }
-  while (0 < nbytes);
-
-  if (fclose (stdout) != 0)
-    output_errno = errno;
-
-  if (output_errno)
-    {
-      errno = output_errno;
-      perror ("output");
     }
 }
