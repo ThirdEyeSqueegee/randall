@@ -49,7 +49,7 @@ outputs.
 6. I modified randall.c to conditionally validate the command line inputs that
 are passed into randall, and to throw errors or initialize modules accordingly.
 
-7. I implemented the parser() function in options.c, which user getopt to parse
+7. I implemented the parser() function in options.c, which uses getopt to parse
 command line options. I defined a struct options in options.h, which contains
 metainformation about the command line options that are passed into randall.
 
@@ -60,9 +60,9 @@ function. I then included mrand_rand64.h in randall.c.
 9. I moved the code that handles output from main() in randall.c to a new
 function, output() in output.c.
 
-10. I modified the writebytes() function in output.c to handle the `-o N` option,
-i.e., write N random bytes at a time using the write syscall instead of writing
-bytes to stdio using putchar().
+10. I modified the writebytes() function in output.c to handle the `-o N` 
+option, i.e., write N random bytes at a time using the write syscall instead of 
+writing to stdio using putchar().
 
 11. I modified the Makefile to correctly link and compile the various source
 files that I created, and modified the submission-files variable in the Makefile
