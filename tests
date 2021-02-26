@@ -156,5 +156,5 @@ fi
 
 sleep 0.5
 
-echo "\$ strace --trace=write ./randall -o 27 100 2>&1 >/dev/null | grep "= 27""
-strace --trace=write ./randall -o 27 100 2>&1 >/dev/null | grep "= 27"
+echo "\$ strace -e write ./randall -o 27 100 2>&1 >/dev/null | grep "= 27""
+strace -e write ./randall -o 27 100 2>&1 >/dev/null | grep "= 27"
